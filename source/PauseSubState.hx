@@ -9,26 +9,25 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.input.keyboard.FlxKey;
 import flixel.system.FlxSound;
 import flixel.util.FlxColor;
+import PlayState.swagCounter;
+import Conductor.songPosition;
 
 class PauseSubState extends MusicBeatSubstate
 {
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
 
-	var menuItems:Array<String> = ['Resume', 'Restart Song', 'Exit to menu'];
+	var menuItems:Array<String> = ['Resume', 'Skip Start', 'Restart Song', 'Exit to menu'];
 	var curSelected:Int = 0;
-
 	var pauseMusic:FlxSound;
-
+	var skipselection:Bool = true;
+	
 	public function new(x:Float, y:Float)
 	{
 		super();
-
 		pauseMusic = new FlxSound().loadEmbedded('assets/music/breakfast' + TitleState.soundExt, true, true);
 		pauseMusic.volume = 0;
 		pauseMusic.play(false, FlxG.random.int(0, Std.int(pauseMusic.length / 2)));
-
 		FlxG.sound.list.add(pauseMusic);
-
 		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		bg.alpha = 0.6;
 		bg.scrollFactor.set();
@@ -60,7 +59,7 @@ class PauseSubState extends MusicBeatSubstate
 		var upP = controls.UP_P;
 		var downP = controls.DOWN_P;
 		var accepted = controls.ACCEPT;
-
+		
 		if (upP)
 		{
 			changeSelection(-1);
@@ -73,11 +72,22 @@ class PauseSubState extends MusicBeatSubstate
 		if (accepted)
 		{
 			var daSelected:String = menuItems[curSelected];
-
+			
 			switch (daSelected)
 			{
 				case "Resume":
 					close();
+				case "Skip Start":
+					if (FlxG.sound.music.time < 5000 && skipselection == true) 
+					{
+						swagCounter = 4;
+						FlxG.sound.music.time += 7000;
+						skipselection = false;
+						close();
+						Conductor.songPosition = FlxG.sound.music.time;
+					}else
+						menuItems = ['Resume', 'Restart Song', 'Exit to menu'];
+						close();
 				case "Restart Song":
 					FlxG.resetState();
 				case "Exit to menu":
@@ -126,3 +136,4 @@ class PauseSubState extends MusicBeatSubstate
 		}
 	}
 }
+
